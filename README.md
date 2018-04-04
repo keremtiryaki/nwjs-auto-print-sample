@@ -22,7 +22,7 @@ brew install wine (optional to build windows exe with macosx)
 
 ## To run on macos for development
 ```
-Download nwjs sdk and extract main folder use 
+Download nwjs sdk and extract main folder. and use this command
 npm run start
 ```
 

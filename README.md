@@ -4,7 +4,7 @@
 ## Description
 An auto print sample created with nwjs. 
 It supports Windows XP 
-(also nwjs supports osx and linux but not tested by us.)
+(also nwjs supports osx and linux but not tested)
 
 
 ## Overview

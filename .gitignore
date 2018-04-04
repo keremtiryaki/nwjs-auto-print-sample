@@ -1,0 +1,8 @@
+node_modules/
+build
+nwjs.app
+chromedriver
+minidump_stackwalk
+nwjc
+nwjs
+payload

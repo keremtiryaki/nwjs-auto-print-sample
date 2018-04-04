@@ -1,0 +1,19 @@
+{
+  "name": "bettertraymenu",
+  "version": "0.0.1",
+  "main": "start.html",
+  "chromium-args" : "--kiosk-printing",
+  "window": {
+    "show": false,
+    "frame": true,
+    "toolbar": true
+  },
+  "webkit": {
+    "plugin": true
+  },
+  "scripts": {
+    "start": "nwjs.app/Contents/MacOS/nwjs .",
+    "bw": "rm -rf ./build/ && rm -rf ./node_modules/ && nwbuild -p win32 -v 0.15.4 . && touch ./build/bettertraymenu/win32/0.15.4",
+    "build": "rm -rf ./build/ && rm -rf ./node_modules/ && nwbuild -p osx64 -v 0.14.7 ."
+  }
+}

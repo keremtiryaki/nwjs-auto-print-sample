@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script>
+		var gui = require('nw.gui');
+		var tray = new gui.Tray({
+			title: 'Tray',
+			tooltip: 'Tray Menu',
+			icon: 'tray.png'
+		});
+		var menu = new gui.Menu();
+		// menu.append(new gui.MenuItem({
+		// 	type: 'normal',
+		// 	label: 'Open Application',
+		// 	click: function () {
+		// 		window.open('main/index.html', '_blank');
+		// 	}
+		// }));
+		// menu.append(new gui.MenuItem({
+		// 	type: 'separator'
+		// }));
+		menu.append(new gui.MenuItem({
+			type: 'normal',
+			label: 'Exit',
+			click: function () {
+				gui.App.quit();
+			}
+		}));
+		tray.menu = menu;
+
+		// tray.on('click', function () {
+		// 	window.open('main/index.html', '_blank');
+		// });
+
+		var win = nw.Window.get();
+
+		// Create a new window and get it
+		// nw.Window.open('https://github.com/nwjs/nw.js', {}, function(new_win) {
+		// // do something with the newly created window
+		// });
+
+		// remove auto open
+		setTimeout(function () {
+			nw.Window.open('main/index.html', {
+				// "show": false,
+				// "frame": false,
+				// "icon": 'tray.png',
+				// "fullscreen": true,
+			});
+		}, 2000);
+	</script>
+</head>
+
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+	<textarea id="payload">sample data 123</textarea>
+	<div id="hideMe">
+		<div id="select-printer">
+		</div>
+		<button id="print">Print</button>
+		<br>
+		<br>
+		<br>
+		<br> Console:
+		<div id="output">
+		</div>
+		<section>
+			<br>
+			<br>
+			<br>
+			<br> Sample Notifications:
+			<div class="buttons-group">
+				<h5>Build in</h5>
+				<button id="simple-coffee">Coffee</button>
+				<button id="simple-camera">Camera</button>
+				<button id="simple-car">Car</button>
+			</div>
+		</section>
+	</div>
+
+	<script>
+		var NW = require('nw.gui');
+		var util = require('util');
+		var win = nw.Window.get();
+		var $ = function (selector) {
+			return document.querySelector(selector);
+		}
+		var printBtn = $('#print');
+		printBtn.disabled = true;
+
+		var writeLog = function (msg, type) {
+			var logElement = $("#output");
+			logElement.innerHTML += `<span class=${type}>${msg}</span><br>`;
+			logElement.scrollTop = logElement.scrollHeight;
+		};
+
+		process.on('log', function (message) {
+			writeLog(message);
+		});
+
+		// print error message in log window
+		process.on("uncaughtException", function (exception) {
+			var stack = exception.stack.split("\n");
+			stack.forEach(function (line) {
+				writeLog(line, 'error');
+				process.stdout.write(String(line) + "\n");
+			});
+		});
+
+		function init() {
+			win.getPrinters(function (result) {
+				console.log(result);
+				writeLog("win.getPrinters:\n" + util.inspect(result));
+				writeLog("JSON.stringify:\n" + JSON.stringify(result));
+
+				var selectionHtml = "";
+				if (result.length > 0) {
+					selectionHtml += "<select id='printer-option'>";
+					result.forEach(function (item) {
+						selectionHtml += "<option value=\"" + item.deviceName + "\">";
+						selectionHtml += item.deviceName;
+						selectionHtml += "</option>";
+					});
+					selectionHtml += "</select>";
+					printBtn.disabled = false;
+				} else {
+					printBtn.disabled = true;
+					writeLog('There is no printer!', 'error');
+					selectionHtml += "<span>There is no printer!</span>";
+				}
+				$('#select-printer').innerHTML = selectionHtml;
+			});
+
+			printBtn.onclick = function () {
+				printFunc();
+			}
+
+			$('#simple-coffee').addEventListener('click', function (event) {
+				showNotification("icons/coffee.png", "Your coffee", 'is ready...')
+			});
+
+			$('#simple-camera').addEventListener('click', function (event) {
+				var notif = showNotification("icons/camera.png", "Camera", 'example notification');
+				setTimeout(function () {
+					notif.close();
+				}, 1200);
+			});
+
+			$('#simple-car').addEventListener('click', function (event) {
+				showNotification('icons/car.png', "Taxi is arrived", 'hurry up');
+			});
+		}
+
+		setTimeout(function () {
+			printFunc();
+		}, 2000);
+
+		function printFunc() {
+			if (printBtn.disabled) {
+				showNotification('icons/car.png', "There is no printer", 'There is no printer');
+				return;
+			}
+			// alert('click ok to start auto print');
+			showNotification("icons/coffee.png", "Auto printer starting", 'Auto printer starting');
+			var hide = $('#hideMe');
+			hide.style.display = 'none';
+			var printerNameOption = $('#printer-option');
+			win.print({
+				printer: printerNameOption.value,
+				// pdf_path: 'pdfsample.pdf',
+				headerFooterEnabled: false,
+				marginsType: 1, // 0 - Default; 1 - No margins; 2 - minimum; 3 - Custom, see marginsCustom.
+				landscape: false,
+				// mediaSize: {'name': 'CUSTOM', 'width_microns': 279400, 'height_microns': 215900, 'custom_display_name':'Letter', 'is_default': true},
+				shouldPrintBackgrounds: true,
+				// marginsCustom: {"marginBottom":54,"marginLeft":70,"marginRight":28,"marginTop":32},
+			});
+			setTimeout(function () {
+				hide.style.display = '';
+				showNotification("icons/coffee.png", "print job created", 'print job created');
+			}, 1000);
+		}
+
+
+
+		// NW.JS Notification
+		var showNotification = function (icon, title, body) {
+			if (icon && icon.match(/^\./)) {
+				icon = icon.replace('.', 'file://' + process.cwd());
+			}
+
+			var notification = new Notification(title, {
+				icon: icon,
+				body: body
+			});
+
+			notification.onclick = function () {
+				writeLog("Notification clicked");
+			};
+
+			notification.onclose = function () {
+				writeLog("Notification closed");
+				NW.Window.get().focus();
+			};
+
+			notification.onshow = function () {
+				writeLog("-----<br>" + title);
+			};
+
+			return notification;
+		}
+
+		document.addEventListener('DOMContentLoaded', function () {
+			init();
+		});
+
+		// var aaaa = [{
+		// 	"deviceName": "Possify",
+		// 	"printerDescription": "",
+		// 	"printerName": "Possify",
+		// 	"printerOptions": {
+		// 		"printer-location": "",
+		// 		"printer-make-and-model": "Possify",
+		// 		"system_driverinfo": "Possify;6.0.6001.22116 (vistasp1_ldr.080215-1730);Microsoft® Windows® Operating System;6.0.6001.22116"
+		// 	}
+		// }];
+		// var result = [{
+		// 	"deviceName": "Print to PDF (Mac Desktop)",
+		// 	"printerDescription": "",
+		// 	"printerName": "Print to PDF (Mac Desktop)",
+		// 	"printerOptions": {
+		// 		"printer-location": "",
+		// 		"printer-make-and-model": "HP Color LaserJet 8500 PS",
+		// 		"system_driverinfo": "HP Color LaserJet 8500 PS;6.0.6000.16386 (vista_rtm.061101-2205);Microsoft® Windows® Operating System;6.0.6000.16386"
+		// 	}
+		// }];
+	</script>
+</body>
+
+</html>
